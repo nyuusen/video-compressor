@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"syscall"
 )
 
 type Config struct {
@@ -16,22 +19,35 @@ func main() {
 
 	f, err := os.Open("config.json")
 	if err != nil {
-		fmt.Printf("open file error: %s\n", err)
-		os.Exit(1)
+		log.Fatal("open file error:", err)
 	}
 	defer f.Close()
 	b, err := io.ReadAll(f)
 	if err != nil {
-		fmt.Printf("file read error:%s\n", err)
-		os.Exit(1)
+		log.Fatal("file read error:", err)
 	}
 
 	config := &Config{}
 	err = json.Unmarshal(b, config)
 	if err != nil {
-		fmt.Printf("json unmarshal error:%s\n", err)
-		os.Exit(1)
+		log.Fatal("json unmarshal error:", err)
 	}
 
 	fmt.Printf("filepath: %s\n", config.Filepath)
+
+	err = syscall.Mkfifo(config.Filepath, 0600)
+	if err != nil {
+		log.Fatal("create named pipe error:", err)
+	}
+
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		input := scanner.Text()
+
+		if input == "exit" {
+			break
+		}
+
+	}
+
 }
