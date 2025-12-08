@@ -32,7 +32,7 @@ func main() {
 			if err != nil {
 				log.Fatal("read error:", err)
 			}
-			fmt.Printf("receive data %s (size: %d)", string(buf), n)
+			fmt.Printf("receive data is %s (size: %d)", string(buf), n)
 		}(conn)
 	}
 }
